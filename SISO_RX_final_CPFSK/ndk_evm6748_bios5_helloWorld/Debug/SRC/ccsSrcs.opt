@@ -1,0 +1,1 @@
+"../SRC/edma.c" "../SRC/emacHooks.c" "../SRC/evminit.c" "../SRC/hello.c" "../SRC/helloWorld.c" "../SRC/interrupt.c" "../SRC/intvecs.asm" "../SRC/main.c" "../SRC/psc.c" 

@@ -1,0 +1,113 @@
+/*
+ * DSP/BIOS Configuration Script for TCP/IP Stack Example Application 
+ */
+
+/* Start with the generic evmOMAPL138 */
+utils.loadPlatform("ti.platforms.evmOMAPL138");
+
+utils.importFile('ndk.tci');
+
+/* The following DSP/BIOS Features are enabled.  */
+bios.enableMemoryHeaps(prog);
+bios.enableRealTimeAnalysis(prog);
+bios.enableRtdx(prog);
+bios.enableTskManager(prog);
+
+/* create the NDK stack thread */
+bios.tskNdkStackTest 			= bios.TSK.create("tskNdkStackTest");
+bios.tskNdkStackTest.fxn 		= prog.extern("StackTest");
+bios.tskNdkStackTest.stackSize 		= 0x1000;
+bios.tskNdkStackTest.priority 		= 0x5;
+
+/* Check that stack size is big enough for the application */
+if (bios.MEM.STACKSIZE < 0x1000) {
+	bios.MEM.STACKSIZE += 0x1000;
+}
+
+/* Board specific settings */
+bios.MEM.instance("IRAM").len = 0x0002ffff;
+
+/* Create a heap in external memory */
+bios.MEM.instance("DDR").createHeap = 1;
+bios.MEM.instance("DDR").heapSize = 0x00040000; /* (S0305) was 0x00010000; */
+bios.MEM.BIOSOBJSEG = prog.get("DDR");
+bios.MEM.MALLOCSEG = prog.get("DDR");
+
+bios.GBL.C64PLUSL2CFG = "256k";
+
+/* Configure Board */
+bios.GBL.CLKOUT = 300.0000;
+bios.GBL.CALLUSERINITFXN = 1;
+bios.GBL.USERINITFXN = prog.extern("EVM_Init");
+
+/* Configure Logging servic for instrumentation */
+bios.LOG.TS = true;
+bios.LOG.create("DVTEvent_Log");
+bios.LOG.instance("DVTEvent_Log").bufSeg = prog.get("DDR");
+bios.LOG.instance("DVTEvent_Log").bufLen = 8192;
+bios.LOG.instance("DVTEvent_Log").comment = "DVT";
+
+/* Configure timer */
+bios.CLK.TIMERSELECT = "Timer 0";
+bios.CLK.RESETTIMER = true;
+
+
+/* Move all sections to external memory */
+bios.setMemCodeSections(prog, prog.get("DDR"));
+bios.setMemDataHeapSections(prog, prog.get("DDR"));
+bios.setMemDataNoHeapSections(prog, prog.get("DDR"));	    			
+
+/* Remove IRAM since we've set L2 to be cache */
+bios.IRAM.destroy();
+
+/* Enable ECM too for NDK interrupt manager to use if required */
+bios.ECM.ENABLE = 1;
+
+if (config.hasReportedError == false) {
+
+bios.TSK.instance("TSK_idle").order = 1;
+bios.TSK.instance("tskNdkStackTest").order = 2;
+bios.TSK.create("TSK_DMA");
+bios.TSK.instance("TSK_DMA").order = 4;
+bios.TSK.instance("TSK_DMA").order = 1;
+bios.TSK.instance("TSK_idle").order = 2;
+bios.TSK.instance("tskNdkStackTest").order = 3;
+bios.TSK.instance("TSK_DMA").priority = 4;
+bios.TSK.instance("TSK_DMA").fxn = prog.extern("DMA_TEST", "asm");
+bios.TSK.instance("TSK_DMA").fxn = prog.extern("DMA_TEST");
+bios.TSK.instance("TSK_DMA").stackSize = 4096;
+bios.TSK.instance("TSK_DMA").priority = 2;
+bios.TSK.instance("TSK_DMA").priority = 7;
+bios.TSK.instance("TSK_idle").order = 1;
+bios.TSK.instance("tskNdkStackTest").order = 2;
+bios.TSK.instance("TSK_DMA").destroy();
+bios.TSK.create("TSK123");
+bios.TSK.instance("TSK123").order = 3;
+bios.TSK.instance("TSK123").fxn = prog.extern("aaa");
+bios.TSK.instance("TSK123").stackSize = 4096;
+bios.TSK.instance("TSK123").order = 1;
+bios.TSK.instance("TSK_idle").order = 2;
+bios.TSK.instance("tskNdkStackTest").order = 3;
+bios.TSK.instance("TSK123").priority = 6;
+bios.TSK.instance("TSK_idle").order = 1;
+bios.TSK.instance("tskNdkStackTest").order = 2;
+bios.TSK.instance("TSK123").destroy();
+bios.MEM.create("DDR_NC");
+bios.MEM.instance("DDR_NC").comment = "non-cache ext. DDR";
+bios.MEM.instance("DDR_NC").base = 0xc4000000;
+bios.MEM.instance("DDR_NC").len = 0x01000000;
+bios.MEM.instance("DDR_NC").heapSize = 0x00080000;
+bios.MEM.instance("DDR_NC").comment = "16MB non-cache ext. DDR";
+bios.MEM.ENABLELOADADDR = 0;
+bios.MEM.USERCOMMANDFILE = 0;
+bios.MEM.USERCOMMANDFILE = 0;
+bios.MEM.USERCOMMANDFILE = 1;
+bios.MEM.USERCOMMANDFILE = 0;
+bios.MEM.USERCOMMANDFILE = 1;
+bios.MEM.USERCOMMANDFILE = 0;
+bios.MEM.USERCOMMANDFILE = 1;
+bios.MEM.USERCOMMANDFILE = 0;
+// !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
+
+    prog.gen();
+}
