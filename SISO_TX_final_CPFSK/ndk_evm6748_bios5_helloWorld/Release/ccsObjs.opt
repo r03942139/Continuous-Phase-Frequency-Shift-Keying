@@ -1,0 +1,1 @@
+-l"./helloWorldcfg.cmd" "./SRC/psc.obj" "./SRC/main.obj" "./SRC/intvecs.obj" "./SRC/interrupt.obj" "./SRC/helloWorld.obj" "./SRC/hello.obj" "./SRC/evminit.obj" "./SRC/emacHooks.obj" "./SRC/edma.obj" "./SRC/connect.obj" "./helloWorldcfg_c.obj" "./helloWorldcfg.obj" -l"libc.a" 
