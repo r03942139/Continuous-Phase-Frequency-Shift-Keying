@@ -1,6 +1,11 @@
-# Continuous-Phase-Frequency-Shift-Keying
+# Continuous-Phase-Frequency-Shift-Keying Modulation System
 This is the GNU-Octave simulation and TI OMAP system codes for Continuous Phase Frequency Shift Keying Modulation.
 Both wire and wireless(antenna) solution is included.
+
+# Project Features
+Built a CPFSK modulation system using C/C++/Matlab and designed features including wired channel and antenna transmission.
+* Achieved best channel error rate performance (8.39%) among 15 groups in the lab contest under strong noise environment.
+* Acted as a software lead in group and improved the system robustness by 15% compared to original QPSK solution.
 
 ## Authors
 
